@@ -1,0 +1,35 @@
+workflows:
+  rizedijital-ios-simulator:
+    name: RizeDijital iOS - Unsigned Simulator
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      node: 22
+      xcode: latest
+    scripts:
+      - name: Install JavaScript dependencies
+        script: npm ci
+      - name: Validate Capacitor configuration
+        script: npx cap doctor
+      - name: Sync native iOS project and CocoaPods
+        script: npx cap sync ios
+      - name: Build unsigned iOS Simulator app
+        script: |
+          set -o pipefail
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/ios \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Package simulator app
+        script: |
+          cd build/ios/Build/Products/Debug-iphonesimulator
+          /usr/bin/zip -qry "$CM_BUILD_DIR/RizeDijital-iOS-Simulator-App.zip" App.app
+    artifacts:
+      - RizeDijital-iOS-Simulator-App.zip
+      - build/ios/Build/Products/Debug-iphonesimulator/App.app/**
+      - /tmp/xcodebuild_logs/*.log

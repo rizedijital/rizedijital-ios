@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#0d6b3f">
+<meta name="robots" content="noindex">
+<title>Çevrimdışı — RizeDijital</title>
+<style>
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 0,#e8f7ee,transparent 42%),linear-gradient(180deg,#f9fcfa,#edf6f0);color:#17231d;font-family:Nunito,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.card{width:min(460px,100%);padding:30px;border:1px solid #d8e8de;border-radius:26px;background:rgba(255,255,255,.96);text-align:center;box-shadow:0 24px 70px rgba(20,70,42,.14)}.icon-wrap{width:92px;height:92px;margin:0 auto 18px;padding:9px;border-radius:26px;background:#eaf7ef;box-shadow:inset 0 0 0 1px rgba(13,107,63,.08)}.icon-wrap img{width:100%;height:100%;object-fit:cover;border-radius:20px}small{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#edf8f1;color:#0d6b3f;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}h1{margin:14px 0 8px;font-size:28px;line-height:1.15;letter-spacing:-.035em}p{margin:0 auto;max-width:350px;color:#6d7d74;font-size:14px;line-height:1.65}.actions{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions button,.actions a{min-height:44px;padding:10px 14px;display:flex;align-items:center;justify-content:center;border:0;border-radius:13px;text-decoration:none;font-size:12px;font-weight:900;cursor:pointer}.actions button{background:linear-gradient(135deg,#0d6b3f,#169358);color:#fff;box-shadow:0 9px 22px rgba(13,107,63,.2)}.actions a{background:#eef4f0;color:#31503e}.status{margin-top:18px;color:#8a9890;font-size:10px;font-weight:800}.status.online{color:#16834b}@media(max-width:480px){.card{padding:24px 18px;border-radius:22px}h1{font-size:24px}.actions{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="icon-wrap"><img src="assets/icon.png" alt="RizeDijital"></div>
+  <small>RizeDijital Mobil</small>
+  <h1>İnternet bağlantısı bulunamadı</h1>
+  <p>Bağlantınızı kontrol edin. İnternet yeniden geldiğinde güncel Rize içeriklerine kaldığınız yerden devam edebilirsiniz.</p>
+  <div class="actions">
+    <button type="button" id="retry">Tekrar Dene</button>
+    <a href="https://www.rizedijital.com/" id="home">Ana Sayfa</a>
+  </div>
+  <div class="status" id="status">Bağlantı bekleniyor…</div>
+</main>
+<script>
+(function(){
+  'use strict';
+  var LIVE='https://www.rizedijital.com';
+  var retry=document.getElementById('retry');
+  var status=document.getElementById('status');
+  var home=document.getElementById('home');
+  var recovering=false;
+
+  function safeInternal(value){
+    if(!value)return '';
+    try{
+      var url=new URL(value,LIVE);
+      if(url.protocol!=='https:'||!/^((www\.)?rizedijital\.com)$/i.test(url.hostname))return '';
+      url.hostname='www.rizedijital.com';
+      if(url.pathname==='/offline.html')return '';
+      return url.href;
+    }catch(e){return '';}
+  }
+
+  var queryTarget='';
+  try{queryTarget=new URLSearchParams(location.search).get('target')||'';}catch(e){}
+  var target=safeInternal(queryTarget)||LIVE+'/';
+  home.href='#';
+
+  function setTarget(value){
+    var next=safeInternal(value);
+    if(next)target=next;
+  }
+
+  function waiting(message){
+    recovering=false;
+    status.textContent=message||'Bağlantı bekleniyor…';
+    status.classList.remove('online');
+  }
+
+  function nativeAction(action,value){
+    if(recovering)return;
+    setTarget(value);
+    status.textContent='Bağlantı kontrol ediliyor…';
+    status.classList.remove('online');
+    var route=action==='home'?'home':'retry';
+    window.location.href='rizedijital://offline/'+route+'?target='+encodeURIComponent(target);
+  }
+
+  function recover(event){
+    if(recovering)return;
+    if(event&&event.detail&&event.detail.target)setTarget(event.detail.target);
+    recovering=true;
+    status.textContent='Bağlantı geri geldi. Sayfa yeniden yükleniyor…';
+    status.classList.add('online');
+    window.setTimeout(function(){window.location.replace(target);},700);
+  }
+
+  retry.addEventListener('click',function(){nativeAction('retry',target);});
+  home.addEventListener('click',function(event){event.preventDefault();nativeAction('home',LIVE+'/');});
+
+  window.addEventListener('rizedijital:native-online',recover);
+  window.addEventListener('rizedijital:native-still-offline',function(event){
+    if(event&&event.detail&&event.detail.target)setTarget(event.detail.target);
+    waiting('Bağlantı hâlâ yok. Lütfen internet bağlantınızı kontrol edin.');
+  });
+  window.addEventListener('online',function(){
+    if(!recovering)status.textContent='Bağlantı doğrulanıyor…';
+  });
+  window.addEventListener('offline',function(){waiting('Bağlantı bekleniyor…');});
+})();
+</script>
+</body>
+</html>
