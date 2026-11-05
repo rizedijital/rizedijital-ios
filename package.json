@@ -4,14 +4,10 @@
   "private": true,
   "description": "RizeDijital iOS Capacitor wrapper",
   "scripts": {
-    "postinstall": "node scripts/restore-gradle-wrapper.mjs",
     "sync": "npx cap sync",
-    "sync:android": "npx cap sync android",
     "sync:ios": "npx cap sync ios",
-    "open:android": "npx cap open android",
     "open:ios": "npx cap open ios",
-    "doctor": "npx cap doctor",
-    "verify": "node scripts/verify-source.mjs"
+    "doctor": "npx cap doctor"
   },
   "dependencies": {
     "@capacitor/app": "8.1.1",
