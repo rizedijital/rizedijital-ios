@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                       let webView = bridgeVC.webView,
                       let current = webView.url?.absoluteString else { return }
                 if current.contains("localhost") || current.contains("offline.html") || current.contains("_capacitor_server_error_") || current.hasPrefix("capacitor://") {
-                    if let url = URL(string: "https://www.rizedijital.com") { webView.load(URLRequest(url: url)) }
+                    if let url = URL(string: "https://rizedijital.com") { webView.load(URLRequest(url: url)) }
                 }
             }
         }

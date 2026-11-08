@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
   backgroundColor: '#ffffff',
   loggingBehavior: 'production',
   server: {
-    url: 'https://www.rizedijital.com',
+    url: 'https://rizedijital.com',
     cleartext: false,
     errorPath: 'offline.html'
   },

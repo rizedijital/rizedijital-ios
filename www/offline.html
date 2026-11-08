@@ -18,14 +18,14 @@
   <p>Bağlantınızı kontrol edin. İnternet yeniden geldiğinde güncel Rize içeriklerine kaldığınız yerden devam edebilirsiniz.</p>
   <div class="actions">
     <button type="button" id="retry">Tekrar Dene</button>
-    <a href="https://www.rizedijital.com/" id="home">Ana Sayfa</a>
+    <a href="https://rizedijital.com/" id="home">Ana Sayfa</a>
   </div>
   <div class="status" id="status">Bağlantı bekleniyor…</div>
 </main>
 <script>
 (function(){
   'use strict';
-  var LIVE='https://www.rizedijital.com';
+  var LIVE='https://rizedijital.com';
   var retry=document.getElementById('retry');
   var status=document.getElementById('status');
   var home=document.getElementById('home');
@@ -36,7 +36,7 @@
     try{
       var url=new URL(value,LIVE);
       if(url.protocol!=='https:'||!/^((www\.)?rizedijital\.com)$/i.test(url.hostname))return '';
-      url.hostname='www.rizedijital.com';
+      url.hostname='rizedijital.com';
       if(url.pathname==='/offline.html')return '';
       return url.href;
     }catch(e){return '';}

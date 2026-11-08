@@ -2,14 +2,19 @@
   "name": "rizedijital-mobile-app",
   "version": "1.0.0",
   "private": true,
-  "description": "RizeDijital iOS Capacitor wrapper",
+  "description": "RizeDijital iOS Capacitor native wrapper",
   "scripts": {
-    "sync": "npx cap sync",
+    "postinstall": "node scripts/ios-postinstall.mjs",
+    "sync": "npx cap sync ios",
     "sync:ios": "npx cap sync ios",
+    "open": "npx cap open ios",
     "open:ios": "npx cap open ios",
-    "doctor": "npx cap doctor"
+    "doctor": "npx cap doctor",
+    "verify": "node scripts/verify-ios.mjs",
+    "verify:ios": "node scripts/verify-ios.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "8.4.2",
     "@capacitor/app": "8.1.1",
     "@capacitor/app-launcher": "8.0.1",
     "@capacitor/browser": "8.0.4",
@@ -34,6 +39,6 @@
   "rizedijital": {
     "pushProvider": "@onesignal/capacitor-plugin",
     "pushRegistrationOwner": "onesignal",
-    "webView": "https://www.rizedijital.com"
+    "webView": "https://rizedijital.com"
   }
 }
