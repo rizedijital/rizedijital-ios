@@ -42,7 +42,27 @@ workflows:
         script: |
           set -euo pipefail
 
-          APP="$CM_BUILD_DIR/mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/App.app"
+          # Derlenmiş uygulamayı gerçek konumunda bul
+APP="$(find "$CM_BUILD_DIR" -type d -name 'App.app' -print -quit)"
+
+# Uygulama yalnızca ZIP olarak varsa aç
+if [ -z "$APP" ]; then
+  ZIP="$(find "$CM_BUILD_DIR" -type f -name 'App.app.zip' -print -quit)"
+
+  if [ -n "$ZIP" ]; then
+    mkdir -p "$CM_BUILD_DIR/simulator-test-app"
+    ditto -x -k "$ZIP" "$CM_BUILD_DIR/simulator-test-app"
+    APP="$(find "$CM_BUILD_DIR/simulator-test-app" -type d -name 'App.app' -print -quit)"
+  fi
+fi
+
+if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+  echo "HATA: Derlenmiş App.app bulunamadı."
+  find "$CM_BUILD_DIR" -name 'App.app*' -print
+  exit 1
+fi
+
+echo "Uygulama bulundu: $APP"
 
           SDKV=$(xcrun --sdk iphonesimulator --show-sdk-version)
           RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-${SDKV//./-}"
