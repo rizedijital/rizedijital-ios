@@ -1,6 +1,6 @@
 {
   "name": "rizedijital-mobile-app",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "private": true,
   "description": "RizeDijital iOS Capacitor native wrapper (Android kaynaklari harictir)",
   "scripts": {

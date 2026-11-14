@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.rizedijital.app',
   appName: 'RizeDijital',
   webDir: 'www',
-  appendUserAgent: ' RizeDijitalNative/1.00.17',
+  appendUserAgent: ' RizeDijitalNative/1.00.18',
   backgroundColor: '#ffffff',
   loggingBehavior: 'production',
   server: {

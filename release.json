@@ -1,12 +1,12 @@
 {
-  "version": "1.00.17",
-  "name": "RizeDijital ortak web/Android/iOS surumu - iOS StoreKit 2 ve admin magaza entegrasyonlari",
-  "androidVersionCode": 54,
-  "androidPublishedVersion": "1.00.2",
-  "androidPublishedVersionCode": 39,
+  "version": "1.00.18",
+  "name": "iOS native sosyal giris ayrimi, bildirim izni ve mobil ust alan uyumu",
+  "androidVersionCode": 55,
+  "androidPublishedVersion": "1.00.14",
+  "androidPublishedVersionCode": 51,
   "androidReleaseStatus": "closed-test",
-  "cacheVersion": "100017",
+  "cacheVersion": "100018",
   "minimumVersion": "0.68.0",
-  "iosBuild": 54,
-  "iosVersion": "1.00.17"
+  "iosBuild": 55,
+  "iosVersion": "1.00.18"
 }

@@ -1,4 +1,4 @@
-# RizeDijital v1.00.17 — deploy with project root containing mobile-app/.
+# RizeDijital v1.00.18 — deploy with project root containing mobile-app/.
 # Replace REPLACE_WITH_YOUR_CODEMAGIC_API_KEY_NAME after creating a Codemagic Developer Portal integration.
 # Signing credentials, API keys and certificates are never stored in this repository.
 workflows:

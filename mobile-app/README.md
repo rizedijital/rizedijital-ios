@@ -1,4 +1,4 @@
-# RizeDijital — yalnizca iOS derleme kaynaklari — 1.00.17 (build 54)
+# RizeDijital — yalnizca iOS derleme kaynaklari — 1.00.18 (build 55)
 
 Bu paket **Android klasoru, web sunucu PHP dosyalari, SQL migrasyonlari veya canli sunucu konfigurasyonu** icermez.
 `mobile-app/www` klasoru, iOS Capacitor derlemesinin gerektirdigi yerel acilis/cevrimdisi varliklaridir; web sunucu projesi degildir.

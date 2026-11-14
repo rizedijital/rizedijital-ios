@@ -1,4 +1,4 @@
-RIZ EDIJITAL IOS-ONLY 1.00.17 (54)
+RIZ EDIJITAL IOS-ONLY 1.00.18 (55)
 
 Kok dizin:
   codemagic.yaml

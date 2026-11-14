@@ -266,16 +266,42 @@ public class RizeDijitalPushPermissionPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "RizeDijitalPushPermission"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "getStatus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "requestPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openSettings", returnType: CAPPluginReturnPromise)
     ]
+
+    private var isSimulator: Bool {
+        #if targetEnvironment(simulator)
+        return true
+        #else
+        return false
+        #endif
+    }
+
     @objc func getStatus(_ call: CAPPluginCall) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             let authorized = settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional
             call.resolve(["granted": authorized, "runtimePermissionGranted": authorized,
-                          "notificationsEnabled": authorized, "settingsRequired": !authorized,
-                          "settingsOpened": false, "settingsTarget": "", "sdkInt": 0])
+                          "notificationsEnabled": authorized,
+                          "settingsRequired": settings.authorizationStatus == .denied,
+                          "canRequestPermission": settings.authorizationStatus == .notDetermined,
+                          "simulator": self.isSimulator, "settingsOpened": false,
+                          "settingsTarget": "", "sdkInt": 0])
         }
     }
+
+    // Sistemin izin penceresi kullanici dokunusuyla acilir; APNs aboneligi
+    // bu izinle karistirilmaz (simulator remote push teslimi dogrulanamaz).
+    @objc func requestPermission(_ call: CAPPluginCall) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if let error = error {
+                call.reject("iOS bildirim izni istenemedi: \(error.localizedDescription)")
+                return
+            }
+            call.resolve(["granted": granted, "simulator": self.isSimulator])
+        }
+    }
+
     @objc func openSettings(_ call: CAPPluginCall) {
         guard let url = URL(string: UIApplication.openSettingsURLString) else {
             call.reject("iOS bildirim ayarları açılamadı.")
