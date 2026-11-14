@@ -37,56 +37,61 @@ workflows:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath "$CM_BUILD_DIR/mobile-app/ios/DerivedData" \
             CODE_SIGNING_ALLOWED=NO build
-    
-          - name: Test iOS Simulator startup
+      - name: Test iOS Simulator startup
         script: |
           set -euo pipefail
 
-          # Derlenmiş uygulamayı gerçek konumunda bul
-APP="$(find "$CM_BUILD_DIR" -type d -name 'App.app' -print -quit)"
+          echo "=== FIND BUILT APP ==="
+          APP="$CM_BUILD_DIR/mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/App.app"
+          if [ ! -d "$APP" ]; then
+            APP="$(find "$CM_BUILD_DIR/mobile-app/ios" -type d -name 'App.app' -print -quit)"
+          fi
+          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+            APP="$(find "$CM_BUILD_DIR" -type d -name 'App.app' -print -quit)"
+          fi
+          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+            ZIP="$(find "$CM_BUILD_DIR" -type f -name 'App.app.zip' -print -quit)"
+            if [ -n "$ZIP" ]; then
+              mkdir -p "$CM_BUILD_DIR/simulator-test-app"
+              ditto -x -k "$ZIP" "$CM_BUILD_DIR/simulator-test-app"
+              APP="$(find "$CM_BUILD_DIR/simulator-test-app" -type d -name 'App.app' -print -quit)"
+            fi
+          fi
+          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
+            echo "ERROR: Built App.app not found. Candidates:"
+            find "$CM_BUILD_DIR/mobile-app/ios" -name 'App.app*' -print || true
+            exit 1
+          fi
 
-# Uygulama yalnızca ZIP olarak varsa aç
-if [ -z "$APP" ]; then
-  ZIP="$(find "$CM_BUILD_DIR" -type f -name 'App.app.zip' -print -quit)"
+          echo "Found app: $APP"
+          if [ ! -f "$APP/Info.plist" ]; then
+            echo "ERROR: App.app/Info.plist is missing"
+            exit 1
+          fi
+          BUNDLE_ID="$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$APP/Info.plist")"
+          echo "Bundle ID: $BUNDLE_ID"
+          if [ "$BUNDLE_ID" != 'com.rizedijital.app' ]; then
+            echo "ERROR: Unexpected application bundle ID"
+            exit 1
+          fi
 
-  if [ -n "$ZIP" ]; then
-    mkdir -p "$CM_BUILD_DIR/simulator-test-app"
-    ditto -x -k "$ZIP" "$CM_BUILD_DIR/simulator-test-app"
-    APP="$(find "$CM_BUILD_DIR/simulator-test-app" -type d -name 'App.app' -print -quit)"
-  fi
-fi
-
-if [ -z "$APP" ] || [ ! -d "$APP" ]; then
-  echo "HATA: Derlenmiş App.app bulunamadı."
-  find "$CM_BUILD_DIR" -name 'App.app*' -print
-  exit 1
-fi
-
-echo "Uygulama bulundu: $APP"
-
-          SDKV=$(xcrun --sdk iphonesimulator --show-sdk-version)
+          echo "=== BOOT SIMULATOR ==="
+          SDKV="$(xcrun --sdk iphonesimulator --show-sdk-version)"
           RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-${SDKV//./-}"
-
           echo "Simulator runtime: $RUNTIME"
-
-          UDID=$(xcrun simctl create rd-ios-test \
-            com.apple.CoreSimulator.SimDeviceType.iPhone-17 \
-            "$RUNTIME")
-
+          UDID="$(xcrun simctl create rd-ios-test com.apple.CoreSimulator.SimDeviceType.iPhone-17 "$RUNTIME")"
           xcrun simctl boot "$UDID"
           xcrun simctl bootstatus "$UDID" -b
 
           echo "=== INSTALL TEST ==="
           xcrun simctl install "$UDID" "$APP"
-
           echo "=== LAUNCH TEST ==="
-          xcrun simctl launch "$UDID" com.rizedijital.app
-
+          xcrun simctl launch "$UDID" "$BUNDLE_ID"
           sleep 8
 
           echo "=== SCREENSHOT ==="
-          xcrun simctl io "$UDID" screenshot \
-            "$CM_BUILD_DIR/ios-preview.png"
+          xcrun simctl io "$UDID" screenshot "$CM_BUILD_DIR/ios-preview.png"
+          echo "Screenshot saved: $CM_BUILD_DIR/ios-preview.png"
     artifacts:
       - mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/*.app
       - /tmp/xcodebuild_logs/*.log
