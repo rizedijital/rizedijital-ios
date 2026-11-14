@@ -12,6 +12,9 @@
  A10000000000000000000006 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* NotificationService.swift */; };
  A10000000000000000000007 /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
  A10000000000000000000008 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* PrivacyInfo.xcprivacy */; };
+ A10000000000000000000009 /* public in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* public */; };
+ A1000000000000000000000A /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* capacitor.config.json */; };
+ A1000000000000000000000B /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* config.xml */; };
 /* End PBXBuildFile section */
 /* Begin PBXContainerItemProxy section */
  C10000000000000000000001 = {isa = PBXContainerItemProxy; containerPortal = D10000000000000000000001 /* Project object */; proxyType = 1; remoteGlobalIDString = E10000000000000000000002; remoteInfo = OneSignalNotificationServiceExtension; };
@@ -31,6 +34,9 @@
  B10000000000000000000010 /* NSE Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = OneSignalNotificationServiceExtension/Info.plist; sourceTree = "<group>"; };
  B10000000000000000000011 /* NSE Entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = OneSignalNotificationServiceExtension.entitlements; path = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
  B10000000000000000000012 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+ B10000000000000000000013 /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+ B10000000000000000000014 /* capacitor.config.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
+ B10000000000000000000015 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 /* Begin PBXFrameworksBuildPhase section */
  F20000000000000000000001 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
@@ -38,7 +44,7 @@
 /* End PBXFrameworksBuildPhase section */
 /* Begin PBXGroup section */
  G10000000000000000000001 = {isa = PBXGroup; children = (G10000000000000000000002 /* App */, G10000000000000000000003 /* OneSignalNotificationServiceExtension */, G10000000000000000000004 /* Products */); sourceTree = "<group>"; };
- G10000000000000000000002 /* App */ = {isa = PBXGroup; path = App; sourceTree = "<group>"; children = (B10000000000000000000001, B10000000000000000000002, B10000000000000000000004, B10000000000000000000003, B10000000000000000000008, B10000000000000000000009, B10000000000000000000012); };
+ G10000000000000000000002 /* App */ = {isa = PBXGroup; path = App; sourceTree = "<group>"; children = (B10000000000000000000001, B10000000000000000000002, B10000000000000000000004, B10000000000000000000003, B10000000000000000000008, B10000000000000000000009, B10000000000000000000012, B10000000000000000000013, B10000000000000000000014, B10000000000000000000015); };
  G10000000000000000000003 /* OneSignalNotificationServiceExtension */ = {isa = PBXGroup; path = OneSignalNotificationServiceExtension; sourceTree = "<group>"; children = (B10000000000000000000006, B10000000000000000000010, B10000000000000000000011); };
  G10000000000000000000004 /* Products */ = {isa = PBXGroup; name = Products; sourceTree = "<group>"; children = (H10000000000000000000001 /* App.app */, B10000000000000000000007); };
 /* End PBXGroup section */
@@ -53,7 +59,7 @@
  D10000000000000000000001 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = YES; LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {E10000000000000000000001 = {CreatedOnToolsVersion = 26.0;}; E10000000000000000000002 = {CreatedOnToolsVersion = 26.0;};};}; buildConfigurationList = I10000000000000000000003; compatibilityVersion = "Xcode 15.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = G10000000000000000000001; productRefGroup = G10000000000000000000004; projectDirPath = ""; projectRoot = ""; targets = (E10000000000000000000001, E10000000000000000000002); };
 /* End PBXProject section */
 /* Begin PBXResourcesBuildPhase section */
- K10000000000000000000001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000002, A10000000000000000000003, A10000000000000000000004, A10000000000000000000008); runOnlyForDeploymentPostprocessing = 0; };
+ K10000000000000000000001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000002, A10000000000000000000003, A10000000000000000000004, A10000000000000000000008, A10000000000000000000009, A1000000000000000000000A, A1000000000000000000000B); runOnlyForDeploymentPostprocessing = 0; };
  K10000000000000000000002 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 /* Begin PBXSourcesBuildPhase section */
