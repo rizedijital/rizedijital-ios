@@ -37,10 +37,40 @@ workflows:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath "$CM_BUILD_DIR/mobile-app/ios/DerivedData" \
             CODE_SIGNING_ALLOWED=NO build
+    
+          - name: Test iOS Simulator startup
+        script: |
+          set -euo pipefail
+
+          APP="$CM_BUILD_DIR/mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/App.app"
+
+          SDKV=$(xcrun --sdk iphonesimulator --show-sdk-version)
+          RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-${SDKV//./-}"
+
+          echo "Simulator runtime: $RUNTIME"
+
+          UDID=$(xcrun simctl create rd-ios-test \
+            com.apple.CoreSimulator.SimDeviceType.iPhone-17 \
+            "$RUNTIME")
+
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+
+          echo "=== INSTALL TEST ==="
+          xcrun simctl install "$UDID" "$APP"
+
+          echo "=== LAUNCH TEST ==="
+          xcrun simctl launch "$UDID" com.rizedijital.app
+
+          sleep 8
+
+          echo "=== SCREENSHOT ==="
+          xcrun simctl io "$UDID" screenshot \
+            "$CM_BUILD_DIR/ios-preview.png"
     artifacts:
       - mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/*.app
       - /tmp/xcodebuild_logs/*.log
-
+      - ios-preview.png
   rizedijital-ios-signed:
     name: RizeDijital iOS Signed IPA (App Store/TestFlight)
     instance_type: mac_mini_m2
