@@ -223,7 +223,7 @@ public class RizeDijitalNativePaymentsPlugin: CAPPlugin, CAPBridgedPlugin {
 public class RizeDijitalLocationPermissionPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "RizeDijitalLocationPermissionPlugin"
     public let jsName = "RizeDijitalLocationPermission"
-    public let pluginMethods = [
+    public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "getStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openLocationSettings", returnType: CAPPluginReturnPromise)
@@ -264,7 +264,7 @@ public class RizeDijitalLocationPermissionPlugin: CAPPlugin, CAPBridgedPlugin {
 public class RizeDijitalPushPermissionPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "RizeDijitalPushPermissionPlugin"
     public let jsName = "RizeDijitalPushPermission"
-    public let pluginMethods = [
+    public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "getStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openSettings", returnType: CAPPluginReturnPromise)
     ]
