@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+*.log
+npm-debug.log*
+ios/App/Pods/
+ios/App/DerivedData/
+ios/App/build/
+xcuserdata/
+*.xcuserstate
+*.p8
+*.p12
+*.mobileprovision
+AuthKey_*.p8

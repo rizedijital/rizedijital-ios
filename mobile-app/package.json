@@ -1,0 +1,42 @@
+{
+  "name": "rizedijital-mobile-app",
+  "version": "1.0.17",
+  "private": true,
+  "description": "RizeDijital iOS Capacitor native wrapper (Android kaynaklari harictir)",
+  "scripts": {
+    "sync": "npx cap sync ios",
+    "sync:ios": "npx cap sync ios",
+    "open:ios": "npx cap open ios",
+    "doctor": "npx cap doctor",
+    "verify:ios": "node scripts/verify-ios-source.mjs",
+    "configure:ios-google": "node scripts/configure-ios-google-client.mjs",
+    "verify:versions": "node scripts/verify-ios-version.mjs"
+  },
+  "dependencies": {
+    "@capacitor/app": "8.1.1",
+    "@capacitor/app-launcher": "8.0.1",
+    "@capacitor/browser": "8.0.4",
+    "@capacitor/core": "8.4.2",
+    "@capacitor/geolocation": "8.2.0",
+    "@capacitor/ios": "8.4.2",
+    "@capacitor/network": "8.0.1",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/share": "8.0.1",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor-community/speech-recognition": "7.0.1",
+    "@onesignal/capacitor-plugin": "1.1.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.2",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "rizedijital": {
+    "pushProvider": "@onesignal/capacitor-plugin",
+    "pushRegistrationOwner": "onesignal",
+    "webView": "https://rizedijital.com"
+  }
+}

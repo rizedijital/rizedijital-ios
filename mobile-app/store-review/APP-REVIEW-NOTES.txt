@@ -1,0 +1,26 @@
+RizeDijital v1.00.0 — App Store / Google Play İnceleme Notları
+
+Uygulama: RizeDijital
+Bundle / Package: com.rizedijital.app
+Canlı servis: https://rizedijital.com
+Hesap silme web kaynağı: https://rizedijital.com/hesap-silme
+
+İNCELEME DEMO HESABI
+Kullanıcı adı: rdappreview0800
+E-posta: appreview0800@rizedijital.com
+Şifre: Güvenlik nedeniyle bu kaynak paketinde tutulmaz. Google Play Console > Uygulama erişimi alanına inceleme süresince geçerli demo şifresini girin.
+SMS OTP: Bu hesap için Admin > Mobil Ayarları > App Review demo erişimi açık olduğu sürece girişte SMS ikinci adımı uygulanmaz. Normal kullanıcıların SMS OTP akışı değişmez.
+
+TEST EDİLEBİLİR NATIVE/APP-LIKE ÖZELLİKLER
+- OneSignal native push notification entegrasyonu ve kullanıcı kontrollü bildirim izni.
+- Foreground konum izniyle Yakınımda ve konuma bağlı şehir hizmetleri.
+- Android fiziksel geri tuşunda WebView history-first davranışı.
+- WhatsApp, telefon, e-posta ve harita hedeflerinin cihaz uygulamalarında açılması.
+- Native Share entegrasyonu.
+- Android App Links / iOS Universal Links.
+- İnternet yok cold-start yerel fallback ve bağlantı geldiğinde otomatik yeniden bağlanma.
+- Native ortamda web dijital ödeme yöntemlerinin gizlenmesi; StoreKit/Play Billing tamamlanana kadar satın alma başlatmayan IAP hookları.
+- Uygulama içinden ve public web URL'sinden gerçek hesap silme akışı.
+
+İNCELEME EKİBİ İÇİN
+Backend inceleme boyunca canlı tutulmalıdır. Demo hesabın kullanıcı adı ve Play Console’da tanımlanan inceleme şifresi başvuru süresince değiştirilmemelidir. Admin'deki App Review demo erişimi başvuru sonuçlanana kadar kapatılmamalıdır.

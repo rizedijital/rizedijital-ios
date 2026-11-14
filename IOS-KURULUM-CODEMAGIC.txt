@@ -1,0 +1,18 @@
+RIZ EDIJITAL IOS-ONLY 1.00.17 (54)
+
+Kok dizin:
+  codemagic.yaml
+  release.json
+  mobile-app/ (ios + www + npm dosyalari + yalniz iOS scriptleri)
+
+Mac ve Apple Developer hesabi olmadan simulator derleme:
+  1. Tum paketi bir Git deposunun kokune yukleyin.
+  2. Codemagic -> Add application -> Git repo secin.
+  3. rizedijital-ios-simulator workflow -> Start new build.
+  4. Basarili derleme Artifacts bolumunde .app olusturur.
+  5. Onizleme icin App Preview imkanini veya dis simulator platformunu kullanin.
+
+Apple hesabi olmadan imzali .ipa ve TestFlight dagitimi YAPILAMAZ.
+APK, Android Gradle, web PHP, SQL dosyalari bu pakette yoktur.
+
+DIKKAT: IPA derlemesi henuz Codemagic uzerinde calistirilip dogrulanmadi.

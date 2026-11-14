@@ -1,0 +1,97 @@
+# RizeDijital v1.00.17 — deploy with project root containing mobile-app/.
+# Replace REPLACE_WITH_YOUR_CODEMAGIC_API_KEY_NAME after creating a Codemagic Developer Portal integration.
+# Signing credentials, API keys and certificates are never stored in this repository.
+workflows:
+  rizedijital-ios-simulator:
+    name: RizeDijital iOS Simulator (no Apple signing)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    environment:
+      node: 22
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/mobile-app"
+          npm ci
+          npm run verify:versions
+          npm run verify:ios
+      - name: Synchronize Capacitor iOS
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/mobile-app"
+          node scripts/configure-ios-google-client.mjs
+          npx cap sync ios
+      - name: Install CocoaPods
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/mobile-app/ios/App"
+          pod install
+      - name: Build iOS Simulator
+        script: |
+          set -e
+          xcodebuild -workspace "$CM_BUILD_DIR/mobile-app/ios/App/App.xcworkspace" \
+            -scheme App -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$CM_BUILD_DIR/mobile-app/ios/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO build
+    artifacts:
+      - mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/*.app
+      - /tmp/xcodebuild_logs/*.log
+
+  rizedijital-ios-signed:
+    name: RizeDijital iOS Signed IPA (App Store/TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    integrations:
+      app_store_connect: REPLACE_WITH_YOUR_CODEMAGIC_API_KEY_NAME
+    environment:
+      node: 22
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.rizedijital.app
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/mobile-app"
+          npm ci
+          npm run verify:versions
+          npm run verify:ios
+      - name: Synchronize Capacitor iOS
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/mobile-app"
+          node scripts/configure-ios-google-client.mjs
+          npx cap sync ios
+      - name: Install CocoaPods
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/mobile-app/ios/App"
+          pod install
+      - name: Apply Apple provisioning profiles
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/mobile-app/ios/App"
+          xcode-project use-profiles
+      - name: Build signed IPA
+        script: |
+          set -e
+          xcode-project build-ipa \
+            --workspace "$CM_BUILD_DIR/mobile-app/ios/App/App.xcworkspace" \
+            --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - mobile-app/ios/App/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - "$HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM"
+    # Upload to TestFlight is deliberately off until signing and sandbox IAP tests succeed.
+    # publishing:
+    #   app_store_connect:
+    #     auth: integration
+    #     submit_to_testflight: true
+    #     submit_to_app_store: false

@@ -1,0 +1,12 @@
+{
+  "version": "1.00.17",
+  "name": "RizeDijital ortak web/Android/iOS surumu - iOS StoreKit 2 ve admin magaza entegrasyonlari",
+  "androidVersionCode": 54,
+  "androidPublishedVersion": "1.00.2",
+  "androidPublishedVersionCode": 39,
+  "androidReleaseStatus": "closed-test",
+  "cacheVersion": "100017",
+  "minimumVersion": "0.68.0",
+  "iosBuild": 54,
+  "iosVersion": "1.00.17"
+}

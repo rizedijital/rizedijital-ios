@@ -1,0 +1,21 @@
+RizeDijital v1.00.0 — Google Play Data Safety / Apple App Privacy kontrol listesi
+
+Bu dosya Console formunu otomatik doldurmaz. Yayından önce Play Console Data Safety ve App Store Connect App Privacy cevapları, üretimde açık olan modüller ve gerçek veri akışlarıyla birebir eşleştirilmelidir.
+
+Kod/veri modelinde özellikle kontrol edilmesi gereken kategoriler:
+- Hesap bilgileri: ad-soyad, kullanıcı adı, e-posta, telefon ve doğrulama durumu.
+- Kullanıcı içeriği: ilan, mesaj, yorum, video/görsel, itiraf ve AI asistan girdileri.
+- Hesap silme geri bildirimi: kullanıcı isterse hesap silerken neden metni alınır; kayıt kullanıcı id/e-posta/telefon/IP ile ilişkilendirilmeden anonim tutulur. Console beyanında üretimdeki gerçek kullanım ve saklama süresiyle eşleştirin.
+- Konum: kullanıcı izin verdiğinde foreground yaklaşık/kesin konum; Yakınımda ve konuma bağlı şehir hizmetleri için.
+- Cihaz/uygulama kimlikleri: OneSignal subscription/OneSignal kimliği, cihaz anahtarı ve push izin/abonelik durumu.
+- Üçüncü taraf push işleyicisi: OneSignal; Android push taşıma katmanı FCM kimlik bilgileri OneSignal Dashboard üzerinden yapılandırılır.
+- AI özellikleri açıksa kullanıcı tarafından AI'ya gönderilen içerik, seçili AI sağlayıcısında işlenebilir. Console beyanı üretimde etkin sağlayıcılar ve gizlilik metniyle eşleşmelidir.
+- Ödeme/sipariş kayıtları: web ödeme yöntemleri native uygulamada gizlidir; geçmiş işlem kayıtları yasal/muhasebesel gereksinimler nedeniyle sınırlı süre tutulabilir.
+
+Yayın öncesi doğrulama:
+1. OneSignal Dashboard > Android platformunda güncel FCM v1 Service Account/credential etkin mi?
+2. iOS APNs credential ve OneSignal Notification Service Extension imzaları doğru mu?
+3. Google Play Data Safety'de konum ve cihaz tanımlayıcıları doğru beyan edildi mi?
+4. AI modülleri üretimde açıksa üçüncü taraf veri işleme/paylaşım beyanı güncel mi?
+5. App Store Connect App Privacy cevapları web+native uygulamanın gerçek veri toplamasıyla eşleşiyor mu?
+6. Account deletion URL alanına https://rizedijital.com/hesap-silme girildi mi?
