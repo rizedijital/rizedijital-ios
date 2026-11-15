@@ -22,8 +22,9 @@ workflows:
         script: |
           set -e
           cd "$CM_BUILD_DIR/mobile-app"
-          node scripts/configure-ios-google-client.mjs
           npx cap sync ios
+          # Live web config -> Google iOS OAuth Client ID -> Info.plist URL scheme
+          node scripts/configure-ios-google-client.mjs
       - name: Install CocoaPods
         script: |
           set -e
@@ -121,8 +122,9 @@ workflows:
         script: |
           set -e
           cd "$CM_BUILD_DIR/mobile-app"
-          node scripts/configure-ios-google-client.mjs
           npx cap sync ios
+          # Live web config -> Google iOS OAuth Client ID -> Info.plist URL scheme
+          node scripts/configure-ios-google-client.mjs
       - name: Install CocoaPods
         script: |
           set -e
