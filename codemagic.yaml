@@ -1,10 +1,9 @@
-
 # RizeDijital v1.00.18
 # Project root must contain mobile-app/
-# iOS App Store / TestFlight signing configuration
+# iOS Simulator and App Store/TestFlight archive diagnostics
+# Signed workflow is in DIAGNOSTIC mode: archive + full Xcode error log, no IPA export.
 
 workflows:
-
   rizedijital-ios-simulator:
     name: RizeDijital iOS Simulator (no Apple signing)
     instance_type: mac_mini_m2
@@ -95,19 +94,19 @@ workflows:
           SDKV="$(xcrun --sdk iphonesimulator --show-sdk-version)"
           RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-${SDKV//./-}"
 
-          UDID="$(xcrun simctl create rd-ios-test com.apple.CoreSimulator.SimDeviceType.iPhone-17 "$RUNTIME")"
-          xcrun simctl boot "$UDID"
-          xcrun simctl bootstatus "$UDID" -b
+          SIMULATOR_ID=$(xcrun simctl create rd-ios-test com.apple.CoreSimulator.SimDeviceType.iPhone-17 "$RUNTIME")
+          xcrun simctl boot "$SIMULATOR_ID"
+          xcrun simctl bootstatus "$SIMULATOR_ID" -b
 
           echo "=== INSTALL TEST ==="
-          xcrun simctl install "$UDID" "$APP"
+          xcrun simctl install "$SIMULATOR_ID" "$APP"
 
           echo "=== LAUNCH TEST ==="
-          xcrun simctl launch "$UDID" "$BUNDLE_ID"
+          xcrun simctl launch "$SIMULATOR_ID" "$BUNDLE_ID"
           sleep 8
 
           echo "=== SCREENSHOT ==="
-          xcrun simctl io "$UDID" screenshot "$CM_BUILD_DIR/ios-preview.png"
+          xcrun simctl io "$SIMULATOR_ID" screenshot "$CM_BUILD_DIR/ios-preview.png"
 
           echo "Screenshot saved: $CM_BUILD_DIR/ios-preview.png"
 
@@ -115,7 +114,6 @@ workflows:
       - mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/*.app
       - /tmp/xcodebuild_logs/*.log
       - ios-preview.png
-
 
   rizedijital-ios-signed:
     name: RizeDijital iOS Signed IPA (App Store/TestFlight)
@@ -162,22 +160,43 @@ workflows:
           cd "$CM_BUILD_DIR/mobile-app/ios/App"
           xcode-project use-profiles
 
-      - name: Build signed IPA
+      # TEMPORARY DIAGNOSTIC STEP:
+      # Direct xcodebuild captures the full archive error instead of only
+      # printing "Failed to archive". Replace with build-ipa after diagnosis.
+      - name: Diagnose iOS Release Archive
         script: |
-          set -e
-          xcode-project build-ipa \
-            --workspace "$CM_BUILD_DIR/mobile-app/ios/App/App.xcworkspace" \
-            --scheme App
+          set -uo pipefail
+          cd "$CM_BUILD_DIR/mobile-app"
+          LOG="$CM_BUILD_DIR/rizedijital-xcode-full.log"
+
+          set +e
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$CM_BUILD_DIR/RizeDijital.xcarchive" \
+            archive > "$LOG" 2>&1
+          RESULT=$?
+
+          echo '========== GERCEK XCODE HATALARI =========='
+          grep -nEi 'error:|error |failed|provisioning|codesign|certificate|ARCHIVE FAILED' "$LOG" | tail -100 || true
+          echo '========== SON 100 SATIR =========='
+          tail -100 "$LOG"
+          echo "Archive exit status: $RESULT"
+          if [ "$RESULT" -eq 0 ]; then
+            echo "ARCHIVE SUCCEEDED. IPA export is intentionally disabled during diagnostics."
+          fi
+          exit "$RESULT"
 
     artifacts:
+      - rizedijital-xcode-full.log
+      - /tmp/xcodebuild_logs/*.log
       - build/ios/ipa/*.ipa
       - mobile-app/ios/App/build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
       - "$HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM"
 
-    # TestFlight upload intentionally disabled.
-    # Enable only after signing and sandbox IAP tests succeed.
-    #
+    # TestFlight upload disabled until signing issue is resolved.
     # publishing:
     #   app_store_connect:
     #     auth: integration
