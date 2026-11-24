@@ -1,6 +1,7 @@
 # RizeDijital v1.00.18
 # Repository root contains mobile-app/
 # iOS Simulator + signed App Store IPA workflows.
+# This workflow fails when no IPA is exported.
 
 workflows:
   rizedijital-ios-simulator:
@@ -157,23 +158,37 @@ workflows:
           xcode-project use-profiles \
             --project "$CM_BUILD_DIR/mobile-app/ios/App/App.xcodeproj"
 
-      - name: Build signed IPA
+      - name: Build signed IPA and collect artifact
         script: |
-          set -e
+          set -euo pipefail
           cd "$CM_BUILD_DIR/mobile-app/ios/App"
-          xcode-project build-ipa \
-            --workspace "App.xcworkspace" \
-            --scheme "App"
 
-          echo "=== BUILT IPA FILES ==="
-          find "$CM_BUILD_DIR" -type f -name '*.ipa' -print
-          if ! find "$CM_BUILD_DIR" -type f -name '*.ipa' -print -quit | grep -q .; then
-            echo "ERROR: Build completed without a detectable IPA file."
+          echo "=== CREATE APP STORE IPA ==="
+          xcode-project build-ipa \
+            --workspace "$CM_BUILD_DIR/mobile-app/ios/App/App.xcworkspace" \
+            --scheme App
+
+          echo "=== LOCATE EXPORTED IPA ==="
+          # Codemagic versions may export to different folders.
+          IPA="$(find "$CM_BUILD_DIR" -type f -name '*.ipa' -print -quit)"
+          if [ -z "$IPA" ]; then
+            echo "ERROR: No .ipa was exported. Available archives / export files:"
+            find "$CM_BUILD_DIR" \( -name '*.xcarchive' -o -name 'ExportOptions.plist' -o -name '*.ipa' \) -print || true
             exit 1
           fi
 
+          echo "Found IPA: $IPA"
+          mkdir -p "$CM_BUILD_DIR/ipa_artifacts"
+          DEST="$CM_BUILD_DIR/ipa_artifacts/RizeDijital.ipa"
+          if [ "$IPA" != "$DEST" ]; then
+            cp "$IPA" "$DEST"
+          fi
+          test -s "$DEST" || { echo "ERROR: IPA file is empty"; exit 1; }
+          echo "=== IPA READY ==="
+          ls -lh "$DEST"
+
     artifacts:
-      - "**/*.ipa"
+      - ipa_artifacts/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - "$HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM"
 
