@@ -1,7 +1,7 @@
 # RizeDijital v1.00.18
 # Repository root contains mobile-app/
 # iOS Simulator + signed App Store IPA workflows.
-# This workflow fails when no IPA is exported.
+# Signed workflow exports an IPA and uploads it to App Store Connect / TestFlight.
 
 workflows:
   rizedijital-ios-simulator:
@@ -192,9 +192,8 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
       - "$HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM"
 
-    # Manual TestFlight upload first. Enable publishing only after validation.
-    # publishing:
-    #   app_store_connect:
-    #     auth: integration
-    #     submit_to_testflight: true
-    #     submit_to_app_store: false
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
