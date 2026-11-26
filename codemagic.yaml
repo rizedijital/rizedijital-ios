@@ -69,6 +69,8 @@ workflows:
       app_store_connect: "Codemagic RizeDijital"
 
     environment:
+      groups:
+        - rizedijital
       node: 22
       xcode: latest
       cocoapods: default
@@ -93,24 +95,27 @@ workflows:
           npx cap sync ios
           node scripts/configure-ios-google-client.mjs
 
-      - name: Assign a new Apple build number
+      - name: Verify Apple build history and assign unique number
         script: |
           set -euo pipefail
           cd "$CM_BUILD_DIR/ios-apple"
-          # Set APP_STORE_APPLE_ID in Codemagic for App Store Connect verification.
-          # Without it, Codemagic's monotonically increasing build counter is used.
+          # The numeric Apple ID is NOT the bundle ID (com.rizedijital.app).
+          # Never publish with an unverified fallback number.
+          : "${APP_STORE_APPLE_ID:?Set numeric APP_STORE_APPLE_ID in Codemagic environment variables before publishing}"
+          case "$APP_STORE_APPLE_ID" in *[!0-9]*|'') echo "ERROR: APP_STORE_APPLE_ID must be numeric."; exit 1;; esac
+          echo "Checking highest Apple build across ALL app versions..."
+          LATEST="$(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID" --all-versions)" || {
+            echo "ERROR: App Store Connect lookup failed; stopping to prevent a duplicate upload."; exit 1;
+          }
+          case "$LATEST" in *[!0-9]*|'') echo "ERROR: Unexpected Apple build number: $LATEST"; exit 1;; esac
           SOURCE_BUILD="$(node -p 'require("../release.json").iosBuild')"
-          CI_NUMBER="${CM_BUILD_NUMBER:-1}"
-          case "$CI_NUMBER" in *[!0-9]*|'') echo "Invalid CM_BUILD_NUMBER"; exit 1;; esac
-          NEW_BUILD="$((SOURCE_BUILD + CI_NUMBER))"
-          if [ -n "${APP_STORE_APPLE_ID:-}" ]; then
-            echo "Querying App Store Connect for latest TestFlight build..."
-            LATEST="$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")"
-            case "$LATEST" in *[!0-9]*|'') echo "Cannot verify latest TestFlight build number: $LATEST"; exit 1;; esac
-            if [ "$NEW_BUILD" -le "$LATEST" ]; then NEW_BUILD="$((LATEST + 1))"; fi
-          else
-            echo "WARNING: APP_STORE_APPLE_ID is not configured; unable to check Apple for already used build numbers."
-          fi
+          CI_NUMBER="${CM_BUILD_NUMBER:-0}"
+          case "$CI_NUMBER" in *[!0-9]*|'') echo "ERROR: Invalid CM_BUILD_NUMBER"; exit 1;; esac
+          # Margin provides protection from delayed Apple processing and concurrent builds.
+          NEW_BUILD="$((LATEST + 1))"
+          if [ "$NEW_BUILD" -le "$SOURCE_BUILD" ]; then NEW_BUILD="$((SOURCE_BUILD + 1))"; fi
+          if [ "$NEW_BUILD" -le "$CI_NUMBER" ]; then NEW_BUILD="$((CI_NUMBER + 1))"; fi
+          echo "Apple highest: $LATEST | Source: $SOURCE_BUILD | Codemagic counter: $CI_NUMBER | New: $NEW_BUILD"
           node scripts/set-ios-build-number.mjs "$NEW_BUILD"
           npm run verify:versions
           npm run verify:ios
@@ -131,34 +136,36 @@ workflows:
           xcode-project use-profiles \
             --project "$CM_BUILD_DIR/ios-apple/ios/App/App.xcodeproj"
 
-      - name: Build signed IPA and collect artifact
+      - name: Build signed IPA and validate its actual contents
         script: |
           set -euo pipefail
           cd "$CM_BUILD_DIR/ios-apple/ios/App"
-
           echo "=== CREATE APP STORE IPA ==="
           xcode-project build-ipa \
             --workspace "$CM_BUILD_DIR/ios-apple/ios/App/App.xcworkspace" \
             --scheme App
 
-          echo "=== LOCATE EXPORTED IPA ==="
-          # Codemagic versions may export to different folders.
-          IPA="$(find "$CM_BUILD_DIR" -type f -name '*.ipa' -print -quit)"
-          if [ -z "$IPA" ]; then
-            echo "ERROR: No .ipa was exported. Available archives / export files:"
-            find "$CM_BUILD_DIR" \( -name '*.xcarchive' -o -name 'ExportOptions.plist' -o -name '*.ipa' \) -print || true
+          echo "=== FIND EXPORTED IPA ==="
+          # Reject ambiguous exports rather than publishing a stale/wrong IPA.
+          find "$CM_BUILD_DIR" -type f -name '*.ipa' ! -path '*/ipa_artifacts/*' > /tmp/rizedijital-ipa-paths.txt
+          IPA_COUNT="$(wc -l < /tmp/rizedijital-ipa-paths.txt | tr -d ' ')"
+          if [ "$IPA_COUNT" -ne 1 ]; then
+            echo "ERROR: Expected exactly one newly exported IPA, found $IPA_COUNT:"
+            cat /tmp/rizedijital-ipa-paths.txt
             exit 1
           fi
-
-          echo "Found IPA: $IPA"
+          IPA="$(cat /tmp/rizedijital-ipa-paths.txt)"
+          EXPECTED_BUILD="$(node -p 'require("../release.json").iosBuild')"
+          EXPECTED_VERSION="$(node -p 'require("../release.json").iosVersion')"
+          echo "=== VERIFY ACTUAL IPA METADATA ==="
+          python3 "$CM_BUILD_DIR/ios-apple/scripts/verify-exported-ipa.py" \
+            "$IPA" "$EXPECTED_VERSION" "$EXPECTED_BUILD" "com.rizedijital.app"
           mkdir -p "$CM_BUILD_DIR/ipa_artifacts"
           DEST="$CM_BUILD_DIR/ipa_artifacts/RizeDijital.ipa"
-          if [ "$IPA" != "$DEST" ]; then
-            cp "$IPA" "$DEST"
-          fi
-          test -s "$DEST" || { echo "ERROR: IPA file is empty"; exit 1; }
-          echo "=== IPA READY ==="
+          cp "$IPA" "$DEST"
+          test -s "$DEST"
           ls -lh "$DEST"
+          echo "Validated IPA: version=$EXPECTED_VERSION build=$EXPECTED_BUILD"
 
     artifacts:
       - ipa_artifacts/*.ipa
