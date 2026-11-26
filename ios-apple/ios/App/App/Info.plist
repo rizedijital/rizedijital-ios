@@ -41,6 +41,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>RizeDijital, konuma bağlı şehir hizmetlerini göstermek için yalnızca izin verdiğinizde konumunuzu kullanır. Uygulama arka planda sürekli konum takibi yapmaz.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>RizeDijital, yakınınızdaki şehir hizmetlerini ve konuma bağlı içerikleri göstermek için konumunuzu yalnızca uygulamayı kullanırken kullanır.</string>
 	<key>NSCameraUsageDescription</key>

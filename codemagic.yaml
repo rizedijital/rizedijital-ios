@@ -93,6 +93,29 @@ workflows:
           npx cap sync ios
           node scripts/configure-ios-google-client.mjs
 
+      - name: Assign a new Apple build number
+        script: |
+          set -euo pipefail
+          cd "$CM_BUILD_DIR/ios-apple"
+          # Set APP_STORE_APPLE_ID in Codemagic for App Store Connect verification.
+          # Without it, Codemagic's monotonically increasing build counter is used.
+          SOURCE_BUILD="$(node -p 'require("../release.json").iosBuild')"
+          CI_NUMBER="${CM_BUILD_NUMBER:-1}"
+          case "$CI_NUMBER" in *[!0-9]*|'') echo "Invalid CM_BUILD_NUMBER"; exit 1;; esac
+          NEW_BUILD="$((SOURCE_BUILD + CI_NUMBER))"
+          if [ -n "${APP_STORE_APPLE_ID:-}" ]; then
+            echo "Querying App Store Connect for latest TestFlight build..."
+            LATEST="$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")"
+            case "$LATEST" in *[!0-9]*|'') echo "Cannot verify latest TestFlight build number: $LATEST"; exit 1;; esac
+            if [ "$NEW_BUILD" -le "$LATEST" ]; then NEW_BUILD="$((LATEST + 1))"; fi
+          else
+            echo "WARNING: APP_STORE_APPLE_ID is not configured; unable to check Apple for already used build numbers."
+          fi
+          node scripts/set-ios-build-number.mjs "$NEW_BUILD"
+          npm run verify:versions
+          npm run verify:ios
+          npm run verify:release
+
       - name: Install CocoaPods
         script: |
           set -e

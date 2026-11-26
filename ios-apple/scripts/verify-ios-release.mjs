@@ -9,7 +9,10 @@ const entNse = mustRead('ios/App/OneSignalNotificationServiceExtension/OneSignal
 const swift = mustRead('ios/App/App/AppDelegate.swift');
 const pod = mustRead('ios/App/Podfile');
 const config = mustRead('capacitor.config.ts');
+const info = mustRead('ios/App/App/Info.plist');
 const tests = [
+  ['Apple 90683 konum kullanımı açıklaması', /<key>NSLocationAlwaysAndWhenInUseUsageDescription<\/key>\s*<string>[^<]+<\/string>/.test(info)],
+  ['Ön plan konum açıklaması', /<key>NSLocationWhenInUseUsageDescription<\/key>\s*<string>[^<]+<\/string>/.test(info)],
   ['iOS app bundle ID', pbx.includes('PRODUCT_BUNDLE_IDENTIFIER = com.rizedijital.app;')],
   ['OneSignal extension bundle ID', pbx.includes('PRODUCT_BUNDLE_IDENTIFIER = com.rizedijital.app.OneSignalNotificationServiceExtension;')],
   ['App / NSE signing entitlements', pbx.includes('App/App.entitlements') && pbx.includes('OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements')],

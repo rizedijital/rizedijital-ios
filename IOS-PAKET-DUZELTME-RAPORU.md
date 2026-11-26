@@ -33,3 +33,12 @@ AppDelegate.swift, StoreKit iş mantığı, Apple ve Google native giriş, OneSi
 - Yeni IPA hedefi: **1.00.19 (56)**.
 - `release.json`, iki Info.plist, Xcode App ve NSE ayarları, Capacitor User-Agent ve npm sürümü eşitlendi.
 - Birim doğrulamaları kaynak düzeyindedir; gerçek Xcode derlemesi ve App Store Connect üzerinde 56 build kullanılabilirliği kontrol edilmelidir.
+
+## 27 Kasım 2026 ek düzeltme (kullanıcının v1.00.19 Build 56 paketi üzerinde)
+
+- `Info.plist` içine Apple 90683 uyarısındaki `NSLocationAlwaysAndWhenInUseUsageDescription` açıklaması eklendi. Mevcut ön plan konum izni korundu; arka plan konum servisi açılmadı.
+- `scripts/set-ios-build-number.mjs` eklendi. Build numarasını uygulama, OneSignal extension, Xcode Debug/Release ve `release.json` arasında birlikte günceller.
+- Codemagic signed workflow, `CM_BUILD_NUMBER` ile Build 56'dan daha yüksek bir numara üretir. Codemagic `APP_STORE_APPLE_ID` tanımlanırsa Apple'daki son TestFlight build numarasını da sorgulayıp üzerine çıkar.
+- Kaynak ve Apple izin kontrollerine gerekli konum açıklamalarını kontrol eden testler eklendi.
+- `90725` SDK uyarısı Nisan 2027 gereksinimidir. Xcode latest korunmuştur; gerçek Apple SDK sürümü Codemagic derlemesinde teyit edilmelidir.
+- Herhangi bir Xcode/macos ortamında imzalı IPA derlemesi yapılmamıştır. OneSignal, StoreKit ve sosyal giriş çalışma testleri cihazda yapılmalıdır.
