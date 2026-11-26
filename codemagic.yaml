@@ -108,7 +108,7 @@ workflows:
             echo "ERROR: App Store Connect lookup failed; stopping to prevent a duplicate upload."; exit 1;
           }
           case "$LATEST" in *[!0-9]*|'') echo "ERROR: Unexpected Apple build number: $LATEST"; exit 1;; esac
-          SOURCE_BUILD="$(node -p 'require("../release.json").iosBuild')"
+          SOURCE_BUILD="$(node -p 'require(process.env.CM_BUILD_DIR + "/release.json").iosBuild')"
           CI_NUMBER="${CM_BUILD_NUMBER:-0}"
           case "$CI_NUMBER" in *[!0-9]*|'') echo "ERROR: Invalid CM_BUILD_NUMBER"; exit 1;; esac
           # Margin provides protection from delayed Apple processing and concurrent builds.
@@ -155,8 +155,8 @@ workflows:
             exit 1
           fi
           IPA="$(cat /tmp/rizedijital-ipa-paths.txt)"
-          EXPECTED_BUILD="$(node -p 'require("../release.json").iosBuild')"
-          EXPECTED_VERSION="$(node -p 'require("../release.json").iosVersion')"
+          EXPECTED_BUILD="$(node -p 'require(process.env.CM_BUILD_DIR + "/release.json").iosBuild')"
+          EXPECTED_VERSION="$(node -p 'require(process.env.CM_BUILD_DIR + "/release.json").iosVersion')"
           echo "=== VERIFY ACTUAL IPA METADATA ==="
           python3 "$CM_BUILD_DIR/ios-apple/scripts/verify-exported-ipa.py" \
             "$IPA" "$EXPECTED_VERSION" "$EXPECTED_BUILD" "com.rizedijital.app"
