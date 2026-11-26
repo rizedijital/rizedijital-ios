@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '../..');
-const app = path.join(root, 'mobile-app');
+const app = path.resolve(import.meta.dirname, '..');
 const release = JSON.parse(fs.readFileSync(path.join(root, 'release.json'), 'utf8'));
-const version = String(release.version);
+const version = String(release.iosVersion || release.version);
 const build = String(release.iosBuild);
 const read = (rel) => fs.readFileSync(path.join(app, rel), 'utf8');
 const plist = read('ios/App/App/Info.plist');
@@ -12,6 +12,7 @@ const pbx = read('ios/App/App.xcodeproj/project.pbxproj');
 const config = read('capacitor.config.ts');
 const pkg = JSON.parse(read('package.json'));
 const checks = [
+  ['release.json iosVersion/version', String(release.version) === String(release.iosVersion)],
   ['iOS app surumu', plist.includes(`<string>${version}</string>`) && plist.includes(`<string>${build}</string>`)],
   ['OneSignal extension surumu', extension.includes(`<string>${version}</string>`) && extension.includes(`<string>${build}</string>`)],
   ['Xcode surumu', pbx.includes(`MARKETING_VERSION = ${version}`) && pbx.includes(`CURRENT_PROJECT_VERSION = ${build}`)],

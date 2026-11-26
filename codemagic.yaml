@@ -1,5 +1,5 @@
-# RizeDijital v1.00.18
-# Repository root contains mobile-app/
+# RizeDijital v1.00.19
+# Repository root contains ios-apple/
 # iOS Simulator + signed App Store IPA workflows.
 # Signed workflow exports an IPA and uploads it to App Store Connect / TestFlight.
 
@@ -18,101 +18,47 @@ workflows:
       - name: Install npm dependencies
         script: |
           set -e
-          cd "$CM_BUILD_DIR/mobile-app"
+          cd "$CM_BUILD_DIR/ios-apple"
           npm ci
           npm run verify:versions
           npm run verify:ios
+          npm run verify:release
 
       - name: Synchronize Capacitor iOS
         script: |
           set -e
-          cd "$CM_BUILD_DIR/mobile-app"
+          cd "$CM_BUILD_DIR/ios-apple"
           npx cap sync ios
           node scripts/configure-ios-google-client.mjs
 
       - name: Install CocoaPods
         script: |
           set -e
-          cd "$CM_BUILD_DIR/mobile-app/ios/App"
+          cd "$CM_BUILD_DIR/ios-apple/ios/App"
           pod install
+          echo "CocoaPods lockfile generated from the resolved dependencies:"
+          test -s Podfile.lock
+          shasum -a 256 Podfile.lock
 
       - name: Build iOS Simulator
         script: |
           set -e
-          xcodebuild -workspace "$CM_BUILD_DIR/mobile-app/ios/App/App.xcworkspace" \
+          xcodebuild -workspace "$CM_BUILD_DIR/ios-apple/ios/App/App.xcworkspace" \
             -scheme App -configuration Debug -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath "$CM_BUILD_DIR/mobile-app/ios/DerivedData" \
+            -derivedDataPath "$CM_BUILD_DIR/ios-apple/ios/DerivedData" \
             CODE_SIGNING_ALLOWED=NO build
 
       - name: Test iOS Simulator startup
         script: |
           set -euo pipefail
-
-          echo "=== FIND BUILT APP ==="
-          APP="$CM_BUILD_DIR/mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/App.app"
-
-          if [ ! -d "$APP" ]; then
-            APP="$(find "$CM_BUILD_DIR/mobile-app/ios" -type d -name 'App.app' -print -quit)"
-          fi
-
-          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
-            APP="$(find "$CM_BUILD_DIR" -type d -name 'App.app' -print -quit)"
-          fi
-
-          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
-            ZIP="$(find "$CM_BUILD_DIR" -type f -name 'App.app.zip' -print -quit)"
-            if [ -n "$ZIP" ]; then
-              mkdir -p "$CM_BUILD_DIR/simulator-test-app"
-              ditto -x -k "$ZIP" "$CM_BUILD_DIR/simulator-test-app"
-              APP="$(find "$CM_BUILD_DIR/simulator-test-app" -type d -name 'App.app' -print -quit)"
-            fi
-          fi
-
-          if [ -z "$APP" ] || [ ! -d "$APP" ]; then
-            echo "ERROR: Built App.app not found."
-            find "$CM_BUILD_DIR/mobile-app/ios" -name 'App.app*' -print || true
-            exit 1
-          fi
-
-          echo "Found app: $APP"
-
-          if [ ! -f "$APP/Info.plist" ]; then
-            echo "ERROR: App.app/Info.plist is missing"
-            exit 1
-          fi
-
-          BUNDLE_ID="$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$APP/Info.plist")"
-          echo "Bundle ID: $BUNDLE_ID"
-
-          if [ "$BUNDLE_ID" != 'com.rizedijital.app' ]; then
-            echo "ERROR: Unexpected application bundle ID"
-            exit 1
-          fi
-
-          echo "=== BOOT SIMULATOR ==="
-          SDKV="$(xcrun --sdk iphonesimulator --show-sdk-version)"
-          RUNTIME="com.apple.CoreSimulator.SimRuntime.iOS-${SDKV//./-}"
-
-          SIMULATOR_ID="$(xcrun simctl create rd-ios-test com.apple.CoreSimulator.SimDeviceType.iPhone-17 "$RUNTIME")"
-          xcrun simctl boot "$SIMULATOR_ID"
-          xcrun simctl bootstatus "$SIMULATOR_ID" -b
-
-          echo "=== INSTALL TEST ==="
-          xcrun simctl install "$SIMULATOR_ID" "$APP"
-
-          echo "=== LAUNCH TEST ==="
-          xcrun simctl launch "$SIMULATOR_ID" "$BUNDLE_ID"
-          sleep 8
-
-          echo "=== SCREENSHOT ==="
-          xcrun simctl io "$SIMULATOR_ID" screenshot "$CM_BUILD_DIR/ios-preview.png"
-          echo "Screenshot saved: $CM_BUILD_DIR/ios-preview.png"
+          bash "$CM_BUILD_DIR/ios-apple/scripts/test-ios-simulator.sh"
 
     artifacts:
-      - mobile-app/ios/DerivedData/Build/Products/Debug-iphonesimulator/*.app
+      - ios-apple/ios/DerivedData/Build/Products/Debug-iphonesimulator/*.app
       - /tmp/xcodebuild_logs/*.log
       - ios-preview.png
+      - ios-apple/ios/App/Podfile.lock
 
   rizedijital-ios-signed:
     name: RizeDijital iOS Signed IPA (App Store/TestFlight)
@@ -134,38 +80,42 @@ workflows:
       - name: Install npm dependencies
         script: |
           set -e
-          cd "$CM_BUILD_DIR/mobile-app"
+          cd "$CM_BUILD_DIR/ios-apple"
           npm ci
           npm run verify:versions
           npm run verify:ios
+          npm run verify:release
 
       - name: Synchronize Capacitor iOS
         script: |
           set -e
-          cd "$CM_BUILD_DIR/mobile-app"
+          cd "$CM_BUILD_DIR/ios-apple"
           npx cap sync ios
           node scripts/configure-ios-google-client.mjs
 
       - name: Install CocoaPods
         script: |
           set -e
-          cd "$CM_BUILD_DIR/mobile-app/ios/App"
+          cd "$CM_BUILD_DIR/ios-apple/ios/App"
           pod install
+          echo "CocoaPods lockfile generated from the resolved dependencies:"
+          test -s Podfile.lock
+          shasum -a 256 Podfile.lock
 
       - name: Apply Apple provisioning profiles
         script: |
           set -e
           xcode-project use-profiles \
-            --project "$CM_BUILD_DIR/mobile-app/ios/App/App.xcodeproj"
+            --project "$CM_BUILD_DIR/ios-apple/ios/App/App.xcodeproj"
 
       - name: Build signed IPA and collect artifact
         script: |
           set -euo pipefail
-          cd "$CM_BUILD_DIR/mobile-app/ios/App"
+          cd "$CM_BUILD_DIR/ios-apple/ios/App"
 
           echo "=== CREATE APP STORE IPA ==="
           xcode-project build-ipa \
-            --workspace "$CM_BUILD_DIR/mobile-app/ios/App/App.xcworkspace" \
+            --workspace "$CM_BUILD_DIR/ios-apple/ios/App/App.xcworkspace" \
             --scheme App
 
           echo "=== LOCATE EXPORTED IPA ==="
@@ -189,6 +139,7 @@ workflows:
 
     artifacts:
       - ipa_artifacts/*.ipa
+      - ios-apple/ios/App/Podfile.lock
       - /tmp/xcodebuild_logs/*.log
       - "$HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM"
 

@@ -1,9 +1,9 @@
-RIZ EDIJITAL IOS-ONLY 1.00.18 (55)
+RIZ EDIJITAL IOS-ONLY 1.00.19 (56)
 
 Kok dizin:
   codemagic.yaml
   release.json
-  mobile-app/ (ios + www + npm dosyalari + yalniz iOS scriptleri)
+  ios-apple/ (ios + www + npm dosyalari + yalniz iOS scriptleri)
 
 Mac ve Apple Developer hesabi olmadan simulator derleme:
   1. Tum paketi bir Git deposunun kokune yukleyin.

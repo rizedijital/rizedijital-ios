@@ -1,5 +1,5 @@
 /**
- * RizeDijital 1.00.18 — Google iOS OAuth URL scheme is derived from the public,
+ * RizeDijital iOS — Google iOS OAuth URL scheme is derived from the public,
  * non-secret Client ID in Admin > Mobil Ayarlar at iOS build time.
  *
  * Normal use (Codemagic): node scripts/configure-ios-google-client.mjs
@@ -57,7 +57,7 @@ function applyScheme(config) {
   const social = config?.native_bridge?.social_login;
   const provider = social?.providers?.google;
   if (config?.schema_version !== 1 || social?.platform !== 'ios' || !provider || typeof provider !== 'object') {
-    throw new Error('Beklenen iOS sosyal giriş yapılandırması alınamadı. Web v1.00.18 ve ?platform=ios yanıtını kontrol edin.');
+    throw new Error('Beklenen iOS sosyal giriş yapılandırması alınamadı. Canlı API ?platform=ios yanıtını kontrol edin.');
   }
   const enabled = provider.native_enabled === true;
   const clientId = String(provider.ios_client_id ?? '').trim();

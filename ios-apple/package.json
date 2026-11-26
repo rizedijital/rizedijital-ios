@@ -1,6 +1,6 @@
 {
   "name": "rizedijital-mobile-app",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "private": true,
   "description": "RizeDijital iOS Capacitor native wrapper (Android kaynaklari harictir)",
   "scripts": {
@@ -10,7 +10,8 @@
     "doctor": "npx cap doctor",
     "verify:ios": "node scripts/verify-ios-source.mjs",
     "configure:ios-google": "node scripts/configure-ios-google-client.mjs",
-    "verify:versions": "node scripts/verify-ios-version.mjs"
+    "verify:versions": "node scripts/verify-ios-version.mjs",
+    "verify:release": "node scripts/verify-ios-release.mjs"
   },
   "dependencies": {
     "@capacitor/app": "8.1.1",

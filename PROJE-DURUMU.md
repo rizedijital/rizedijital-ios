@@ -1,11 +1,13 @@
-# RizeDijital — 1.00.18 güncelleme durumu
+# RizeDijital iOS — kaynak paket durumu
 
-- Web ve hedef iOS sürümü: **1.00.18**.
-- iOS native build numarası: **55**, OneSignal Extension: **55**.
-- Android yayınlanmış kapalı test: **1.00.14 / versionCode 51** (bu güncellemeyle değişmedi).
-- Android sonraki kaynak hedefi metadata: **1.00.18 / versionCode 55**, ancak burada Android kaynakları/derlemesi **verilmiyor**.
-- Önceki çalışan Codemagic simulator kurulumu, OneSignal extension `CFBundleExecutable`, Swift `pluginMethods` ve Xcode bundle resource düzeltmeleri korundu.
-- Yeni: admin native Google Android, Google iOS, Apple iOS ayrı anahtarları; iOS native buton sunucu çıktısı; iOS UNUserNotificationCenter izin akışı; iOS mobile header stil düzeni.
-- PHP dosyaları `php -l`, JavaScript `node --check`, Swift `swiftc -frontend -parse`, iOS sürüm/doğrulama, plist ve YAML ayrıştırma kontrolü ve 15 PHP davranış testi **yerel olarak geçmiştir**.
-- **Henüz doğrulanmayanlar:** gerçek Codemagic 1.00.18 derlemesi, iOS görüntü/layout, gerçek Apple/Google sosyal login, iPhone APNs/OneSignal bildirim teslimi ve StoreKit canlı satın alma.
-- Mağaza Abonelikleri 500 hata V2 düzeltmesi veya tasarım dosyaları bu iki güncelleme paketinde değiştirilmez.
+- App Store’da yayımlanmış eski sürüm: **1.00.18 (55)**. Yeni derleme hedefi: **1.00.19 (56)**.
+- Paket yalnız iOS kaynakları içerir: `ios-apple/`. Android/Web projeleri ve PHP sunucusu kapsam dışında.
+- Ana uygulama ve OneSignal Notification Service Extension build ayarları **56** olarak uyumlu.
+- Codemagic kök dosyası `codemagic.yaml`; imzasız simulator ve imzalı IPA iş akışları vardır.
+- Google iOS OAuth URL scheme, canlı public API yanıtına göre Codemagic'te hazırlanır.
+- Apple/Google native sosyal giriş, StoreKit, OneSignal/APNs, konum ve ses tanıma Swift kodları korunmuştur.
+- Node kaynak kontrolleri başarılı: `verify:versions`, `verify:ios`, `verify:release`.
+- macOS/Xcode/CocoaPods Podfile.lock çözümlemesi, gerçek imzalı IPA, fiziksel cihaz, Apple/Google giriş, APNs ve Sandbox satın alma bu ortamda doğrulanamamıştır.
+- Yeni sürüm 1.00.19 (56) için App Store Connect’te 1.00.19 sürüm kaydı açılmalıdır; 56 başka bir yüklemede kullanılmışsa build numarası yeniden yükseltilmelidir.
+
+Diğer ayrıntılar: `IOS-PAKET-DUZELTME-RAPORU.md`.

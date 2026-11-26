@@ -25,7 +25,7 @@ target 'App' do
 end
 
 target 'OneSignalNotificationServiceExtension' do
-  pod 'OneSignalXCFramework', '>= 5.0', '< 6.0'
+  pod 'OneSignalXCFramework', '5.5.5'
 end
 
 post_install do |installer|

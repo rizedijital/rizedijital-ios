@@ -1,12 +1,8 @@
 {
-  "version": "1.00.18",
+  "version": "1.00.19",
   "name": "iOS native sosyal giris ayrimi, bildirim izni ve mobil ust alan uyumu",
-  "androidVersionCode": 55,
-  "androidPublishedVersion": "1.00.14",
-  "androidPublishedVersionCode": 51,
-  "androidReleaseStatus": "closed-test",
-  "cacheVersion": "100018",
+  "cacheVersion": "100019",
   "minimumVersion": "0.68.0",
-  "iosBuild": 55,
-  "iosVersion": "1.00.18"
+  "iosBuild": 56,
+  "iosVersion": "1.00.19"
 }
